@@ -2,8 +2,6 @@
 
 A classic implementation of the Minesweeper game, designed to run locally in any modern web browser. This project offers a clean, single-player experience with core Minesweeper features.
 
-## Screenshot
-
 ![Minesweeper Gameplay](src/assets/screenshot.png)
 
 ## Features
