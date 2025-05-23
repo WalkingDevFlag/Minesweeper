@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper</title>
+    <link rel="stylesheet" href="minesweeper.css">
+    <style>
+        body { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin-top: 15px; 
+            font-family: Arial, sans-serif; /* Added for consistency */
+            transition: background-color 0.3s, color 0.3s; /* For night mode */
+        }
+        .ui-controls { 
+            margin-bottom: 10px; 
+            text-align: center; 
+        }
+        .ui-controls label { 
+            margin-left: 5px; 
+            margin-right: 15px;
+        }
+        .ui-controls button, .ui-controls a {
+            margin: 2px 5px;
+        }
+        /* Dialog styling (some from CSS, some for basic positioning) */
+        .dialog {
+            /* Basic positioning, minesweeper.css has more */
+            position: fixed; 
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 0; /* Let inner divs handle padding */
+            min-width: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 100; /* Ensure dialogs are on top */
+        }
+        .dialog-title { 
+            padding: 8px 12px; 
+            cursor: move; /* For basic dragging */
+            font-size: 14px;
+        }
+        .dialog-title .dialog-close { 
+            float: right; 
+            font-size: 18px; /* Adjusted from CSS for better visibility */
+            line-height: 18px;
+        }
+        .dialog-content { 
+            padding: 10px 15px; 
+        }
+        .dialog-content p {
+            margin: 8px 0;
+        }
+        .dialog-content label {
+            font-weight: normal;
+        }
+        #custom-settings p {
+            margin: 5px 0;
+        }
+        #game-container {
+            /* Styles applied by JS and CSS, just a container */
+        }
+        #game {
+            /* Game board elements are injected here by JS */
+            border: 2px solid; /* Visual consistency based on typical Minesweeper */
+            border-color: #7b7b7b #fff #fff #7b7b7b; /* For default theme */
+        }
+        .night-mode #game {
+            border-color: #505050 #c0c0c0 #c0c0c0 #505050; /* Adjusted for night mode */
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Minesweeper</h1>
+
+    <div class="ui-controls">
+        <button id="newGameBtn">New Game (F2)</button> |
+        <a href="#" id="options-link">Options</a> |
+        <a href="#" id="display-link">Zoom</a> |
+        <a href="#" id="controls-info-link">Controls</a> |
+        <a href="#" id="import-link">Import</a> |
+        <a href="#" id="export-link">Export</a>
+        <br>
+        <input type="checkbox" id="marks"> <label for="marks">Question Marks (?)</label>
+        <button id="toggleNightMode">Toggle Night Mode</button>
+    </div>
+
+    <div id="game-container" class="z100"> <!-- Default zoom class -->
+        <div id="game">
+            <!-- Minesweeper board is built here by minesweeper.js -->
+        </div>
+    </div>
+
+    <!-- Options Dialog -->
+    <div id="options-dialog" class="dialog" style="display:none;">
+        <div class="dialog-title">Game Options <span class="dialog-close">X</span></div>
+        <div class="dialog-content">
+            <p><strong>Select Difficulty:</strong></p>
+            <p><input type="radio" name="gameType" id="gt1" value="1"> <label for="gt1">Beginner (9x9, 10 mines)</label></p>
+            <p><input type="radio" name="gameType" id="gt2" value="2"> <label for="gt2">Intermediate (16x16, 40 mines)</label></p>
+            <p><input type="radio" name="gameType" id="gt3" value="3"> <label for="gt3">Expert (30x16, 99 mines)</label></p>
+            <p><input type="radio" name="gameType" id="gt0" value="0"> <label for="gt0">Custom</label></p>
+            
+            <div id="custom-settings" style="display:none;">
+                <p>Rows: <input type="text" id="customRows" class="dialog-text-input" size="3"> (e.g., 9-24)</p>
+                <p>Cols: <input type="text" id="customCols" class="dialog-text-input" size="3"> (e.g., 9-30)</p>
+                <p>Mines: <input type="text" id="customMines" class="dialog-text-input" size="3"> (e.g., 10-668)</p>
+            </div>
+            <hr>
+            <button id="applyOptionsNewGame">Start New Game with these Settings</button>
+        </div>
+    </div>
+
+    <!-- Controls Info Dialog -->
+    <div id="controls-info-dialog" class="dialog" style="display:none;">
+        <div class="dialog-title">Controls <span class="dialog-close">X</span></div>
+        <div class="dialog-content">
+            <ul>
+                <li><b>Left Click:</b> Reveal square</li>
+                <li><b>Right Click:</b> Flag/Unflag square (or cycle to '?' if question marks enabled)</li>
+                <li><b>Middle Click (or Left+Right Click simultaneously):</b> Reveal adjacent non-flagged squares (chord action)</li>
+                <li><b>Space Bar:</b> Flag/Unflag or Chord on hovered square</li>
+                <li><b>F2 Key:</b> Start a new game</li>
+                <li><b>Ctrl+Click / Cmd+Click (on Mac):</b> Flag/Unflag square</li>
+                <li><b>(After losing) Ctrl+Z / Cmd+Z (on Mac):</b> Undo last move (resets to state before the mine was hit)</li>
+                <li><b>Long Press (Touch Devices):</b> Flag/Unflag square</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- jQuery Core -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <!-- jQuery Migrate Plugin (for jQuery 1.9+ to restore $.browser and other features) -->
+    <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
+    <!-- Your Minesweeper Script -->
+    <script src="minesweeper.js"></script>
+    <script>
+        $(document).ready(function() {
+            // You can add a quick check here to see what jQuery reports for $.browser
+            // console.log("jQuery version:", $.fn.jquery);
+            // console.log("$.browser after migrate:", $.browser);
+
+            // A: highScoreData (placeholder, format: A[level_idx (0-3)][gameType_idx (0-2)])
+            const defaultHighScores = [ 
+                [999, 999, 999], [999, 999, 999], [999, 999, 999], [999, 999, 999]
+            ];
+
+            // Application state for game settings
+            let AppSettings = {
+                gameTypeId: 1, // 1: Beginner, 2: Intermediate, 3: Expert, 0: Custom
+                numRows: 9,
+                numCols: 9,
+                numMines: 10,
+                zoom: 1, // 1 = 100%, 1.5 = 150%, 2 = 200%
+                presets: {
+                    1: { name: "Beginner", numRows: 9, numCols: 9, numMines: 10 },
+                    2: { name: "Intermediate", numRows: 16, numCols: 16, numMines: 40 },
+                    3: { name: "Expert", numRows: 30, numCols: 16, numMines: 99 }
+                }
+            };
+
+            function getGameSettingsForMinesweeper() {
+                return {
+                    gameTypeId: AppSettings.gameTypeId,
+                    numRows: AppSettings.numRows,
+                    numCols: AppSettings.numCols,
+                    numMines: AppSettings.numMines,
+                    zoom: AppSettings.zoom
+                };
+            }
+
+            function setGameSettingsByMinesweeper(settings) {
+                if (typeof settings.gameTypeId !== "undefined") AppSettings.gameTypeId = settings.gameTypeId;
+                if (typeof settings.numRows !== "undefined") AppSettings.numRows = settings.numRows;
+                if (typeof settings.numCols !== "undefined") AppSettings.numCols = settings.numCols;
+                if (typeof settings.numMines !== "undefined") AppSettings.numMines = settings.numMines;
+            }
+
+            const minesweeper = new Minesweeper(defaultHighScores, getGameSettingsForMinesweeper, setGameSettingsByMinesweeper);
+
+            function startNewGameWithCurrentAppSettings() {
+                minesweeper.newGame(null, {
+                    gameTypeId: AppSettings.gameTypeId,
+                    numRows: AppSettings.numRows,
+                    numCols: AppSettings.numCols,
+                    numMines: AppSettings.numMines
+                });
+            }
+            
+            startNewGameWithCurrentAppSettings();
+
+            $('#newGameBtn').click(function() { 
+                startNewGameWithCurrentAppSettings();
+            });
+
+            $('.dialog-close').click(function() { $(this).closest('.dialog').hide(); });
+            $('#options-link').click(function(e) { e.preventDefault(); $('#options-dialog').show(); populateOptionsDialog(); });
+            $('#controls-info-link').click(function(e) { e.preventDefault(); $('#controls-info-dialog').show(); });
+
+            function populateOptionsDialog() {
+                const currentSettings = AppSettings;
+                if (currentSettings.gameTypeId > 0 && AppSettings.presets[currentSettings.gameTypeId]) {
+                    $(`input[name="gameType"][value="${currentSettings.gameTypeId}"]`).prop('checked', true);
+                    $('#custom-settings').hide();
+                } else { 
+                    $('input[name="gameType"][value="0"]').prop('checked', true);
+                    $('#customRows').val(currentSettings.numRows);
+                    $('#customCols').val(currentSettings.numCols);
+                    $('#customMines').val(currentSettings.numMines);
+                    $('#custom-settings').show();
+                }
+            }
+
+            $('input[name="gameType"]').change(function() {
+                if ($(this).val() === "0") { 
+                    $('#custom-settings').show();
+                    const currentPresetId = AppSettings.gameTypeId;
+                    if(currentPresetId > 0 && AppSettings.presets[currentPresetId]){
+                        $('#customRows').val(AppSettings.presets[currentPresetId].numRows);
+                        $('#customCols').val(AppSettings.presets[currentPresetId].numCols);
+                        $('#customMines').val(AppSettings.presets[currentPresetId].numMines);
+                    } else { 
+                        $('#customRows').val(AppSettings.numRows);
+                        $('#customCols').val(AppSettings.numCols);
+                        $('#customMines').val(AppSettings.numMines);
+                    }
+                } else {
+                    $('#custom-settings').hide();
+                }
+            });
+
+            $('#applyOptionsNewGame').click(function() {
+                const selectedGameTypeId = parseInt($('input[name="gameType"]:checked').val());
+
+                if (selectedGameTypeId === 0) { 
+                    AppSettings.gameTypeId = 0;
+                    AppSettings.numRows = parseInt($('#customRows').val());
+                    AppSettings.numCols = parseInt($('#customCols').val());
+                    AppSettings.numMines = parseInt($('#customMines').val());
+
+                    if (isNaN(AppSettings.numRows) || AppSettings.numRows < 5 || AppSettings.numRows > 50 ||
+                        isNaN(AppSettings.numCols) || AppSettings.numCols < 5 || AppSettings.numCols > 50 ||
+                        isNaN(AppSettings.numMines) || AppSettings.numMines < 1) {
+                        alert("Invalid custom game settings. Rows/Cols (5-50), Mines (min 1).");
+                        return;
+                    }
+                    if (AppSettings.numMines >= AppSettings.numRows * AppSettings.numCols) {
+                        alert("Number of mines must be less than the total number of squares.");
+                        return;
+                    }
+                } else if (AppSettings.presets[selectedGameTypeId]) { 
+                    const preset = AppSettings.presets[selectedGameTypeId];
+                    AppSettings.gameTypeId = selectedGameTypeId;
+                    AppSettings.numRows = preset.numRows;
+                    AppSettings.numCols = preset.numCols;
+                    AppSettings.numMines = preset.numMines;
+                } else {
+                    alert("Invalid game type selected.");
+                    return;
+                }
+                
+                startNewGameWithCurrentAppSettings();
+                $('#options-dialog').hide();
+            });
+
+            $('#display-link').click(function(e) {
+                e.preventDefault();
+                let currentZoom = AppSettings.zoom;
+                let nextZoom;
+                if (currentZoom === 1) nextZoom = 1.5;
+                else if (currentZoom === 1.5) nextZoom = 2;
+                else nextZoom = 1;
+                
+                minesweeper.resize(nextZoom); 
+                AppSettings.zoom = nextZoom; 
+            });
+
+            $('#export-link').click(function(e) {
+                e.preventDefault();
+                const exportedData = minesweeper.export_();
+                prompt("Game State (Ctrl+C to copy):", exportedData);
+            });
+
+            $('#import-link').click(function(e) {
+                e.preventDefault();
+                const importedData = prompt("Paste Game State here:");
+                if (importedData && importedData.trim() !== "") {
+                    if (minesweeper.isImportable(importedData)) {
+                        try {
+                            minesweeper.import_(importedData);
+                            populateOptionsDialog();
+                        } catch (error) {
+                            alert("Error importing game: " + error.message);
+                            console.error("Import error details:", error);
+                        }
+                    } else {
+                        alert("Data is not in a recognized importable format.");
+                    }
+                }
+            });
+
+            $('#toggleNightMode').click(function() {
+                $('body').toggleClass('night-mode');
+            });
+
+            minesweeper.onWin = function(gameTypeId, time) {
+                setTimeout(function() {
+                    alert(`Congratulations! You won in ${time} seconds!`);
+                }, 100);
+            };
+            minesweeper.onNewHighScore = function(level, isOfficialRecord) { 
+                 // console.log(`New high score for level ${level}. Official: ${isOfficialRecord}`);
+             };
+            minesweeper.onResize = function() {
+                 // console.log(`Game resized. Current zoom factor: ${AppSettings.zoom}`);
+             };
+
+            $('.dialog-title').on('mousedown', function(e) {
+                var $dialog = $(this).closest('.dialog');
+                if ($(e.target).is('.dialog-close')) {
+                    return;
+                }
+                var offset = $dialog.offset();
+                var relX = e.pageX - offset.left;
+                var relY = e.pageY - offset.top;
+                
+                $dialog.addClass('dragging'); 
+
+                $(document).on('mousemove.dialogDrag', function(moveEvent) {
+                    $dialog.offset({ 
+                        top: Math.max(0, moveEvent.pageY - relY), 
+                        left: Math.max(0, moveEvent.pageX - relX) 
+                    });
+                }).on('mouseup.dialogDrag', function() {
+                    $(document).off('.dialogDrag');
+                    $dialog.removeClass('dragging');
+                });
+                e.preventDefault(); 
+            });
+        });
+    </script>
+
+</body>
+</html>
