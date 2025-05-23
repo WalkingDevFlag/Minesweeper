@@ -5,9 +5,13 @@ html {
 body {
     margin-left: 0;
     margin-top: 15px;
-    font-family: arial;
+    font-family: arial, sans-serif;
     font-size: 12px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .night-mode {
@@ -22,7 +26,19 @@ label {
 
 #game-container {
     position: relative;
-    margin-right: 20px;
+    /* margin-right: 20px; Removed this line */
+}
+
+.ui-controls {
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.ui-controls a, .ui-controls span {
+    margin: 0 5px;
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 #options-link {
@@ -32,8 +48,19 @@ label {
 }
 
 .night-mode #options-link,
-.night-mode a {
+.night-mode a,
+.night-mode .ui-controls a {
     color: #069;
+}
+
+.ui-controls span.separator {
+    color: #333;
+    text-decoration: none;
+    cursor: default;
+}
+
+.night-mode .ui-controls span.separator {
+    color: #888;
 }
 
 #game {
@@ -45,18 +72,27 @@ label {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     touch-action: manipulation;
     -webkit-touch-callout: none;
+    border: 2px solid;
+    border-color: #7b7b7b #fff #fff #7b7b7b;
 }
 
 .night-mode #game {
     background-color: #7e7e7e;
+    border-color: #505050 #c0c0c0 #c0c0c0 #505050;
 }
 
 .dialog {
     background-color: #EEE;
     border: 1px solid #444;
-    position: absolute;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0;
+    min-width: 300px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     display: none;
-    z-index: 1;
+    z-index: 100;
 }
 
 .night-mode .dialog {
@@ -68,6 +104,9 @@ label {
     color: white;
     font-weight: bold;
     background-color: #06f;
+    padding: 8px 12px;
+    cursor: move;
+    font-size: 14px;
 }
 
 .night-mode .dialog-title {
@@ -79,13 +118,30 @@ label {
     color: white;
     text-decoration: none;
     font-weight: bold;
-    font-size: 20px;
-    line-height: 15px;
+    font-size: 18px;
+    line-height: 18px;
     cursor: pointer;
+    float: right;
 }
 
 .night-mode .dialog-close {
     color: #AAA;
+}
+
+.dialog-content {
+    padding: 10px 15px;
+}
+
+.dialog-content p {
+    margin: 8px 0;
+}
+
+.dialog-content label {
+    font-weight: normal;
+}
+
+#custom-settings p {
+    margin: 5px 0;
 }
 
 .dialog-text-input {
@@ -180,4 +236,3 @@ label {
 .z100 #seconds_tens { margin: 4px 0 5px 0; }
 .z100 #seconds_ones { margin: 4px 6px 5px 0; }
 .z100 #face { margin-top: 3px; margin-bottom: 3px; }
-.z100 .dialog { left: 16px; top: 74px; }

@@ -5,79 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minesweeper</title>
     <link rel="stylesheet" href="minesweeper.css">
-    <style>
-        body { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            margin-top: 15px; 
-            font-family: Arial, sans-serif; 
-            transition: background-color 0.3s, color 0.3s; 
-        }
-        .ui-controls { 
-            margin-bottom: 10px; 
-            text-align: center; 
-        }
-        /* Style for the links in ui-controls will be picked up by #options-link style in minesweeper.css */
-        /* We can add specific styling for all links if needed here or in minesweeper.css */
-        .ui-controls a, .ui-controls span { /* Added span for the separators */
-            margin: 0 5px; /* Adjust spacing around links and separators */
-            color: blue; /* Default link color */
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        .night-mode .ui-controls a { /* Night mode link color */
-            color: #069;
-        }
-        .ui-controls span.separator { /* Style for the pipe separator */
-            color: #333; /* Or whatever color you prefer for the pipe */
-            text-decoration: none;
-            cursor: default;
-        }
-        .night-mode .ui-controls span.separator {
-            color: #888;
-        }
-
-        .dialog {
-            position: fixed; 
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 0; 
-            min-width: 300px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 100; 
-        }
-        .dialog-title { 
-            padding: 8px 12px; 
-            cursor: move; 
-            font-size: 14px;
-        }
-        .dialog-title .dialog-close { 
-            float: right; 
-            font-size: 18px; 
-            line-height: 18px;
-        }
-        .dialog-content { 
-            padding: 10px 15px; 
-        }
-        .dialog-content p {
-            margin: 8px 0;
-        }
-        .dialog-content label {
-            font-weight: normal;
-        }
-        #custom-settings p {
-            margin: 5px 0;
-        }
-        #game {
-            border: 2px solid; 
-            border-color: #7b7b7b #fff #fff #7b7b7b; 
-        }
-        .night-mode #game {
-            border-color: #505050 #c0c0c0 #c0c0c0 #505050; 
-        }
-    </style>
 </head>
 <body>
 
@@ -86,198 +13,34 @@
     <div class="ui-controls">
         <a href="#" id="newGameBtn">New Game</a>
         <span class="separator">|</span>
-        <a href="#" id="options-link">Options</a>
+        <a href="#" id="options-link">Settings</a>
         <span class="separator">|</span>
         <a href="#" id="toggleNightModeBtn">Toggle Night Mode</a>
     </div>
 
-    <div id="game-container" class="z100"> 
+    <div id="game-container" class="z100">
         <div id="game">
         </div>
     </div>
 
     <div id="options-dialog" class="dialog" style="display:none;">
-        <div class="dialog-title">Game Options <span class="dialog-close">X</span></div>
+        <div class="dialog-title">Game Settings <span class="dialog-close">X</span></div>
         <div class="dialog-content">
-            <p><strong>Select Difficulty:</strong></p>
-            <p><input type="radio" name="gameType" id="gt1" value="1"> <label for="gt1">Beginner (9x9, 10 mines)</label></p>
-            <p><input type="radio" name="gameType" id="gt2" value="2"> <label for="gt2">Intermediate (16x16, 40 mines)</label></p>
-            <p><input type="radio" name="gameType" id="gt3" value="3"> <label for="gt3">Expert (30x16, 99 mines)</label></p>
-            <p><input type="radio" name="gameType" id="gt0" value="0"> <label for="gt0">Custom</label></p>
-            
-            <div id="custom-settings" style="display:none;">
-                <p>Rows: <input type="text" id="customRows" class="dialog-text-input" size="3"> (e.g., 9-24)</p>
-                <p>Cols: <input type="text" id="customCols" class="dialog-text-input" size="3"> (e.g., 9-30)</p>
-                <p>Mines: <input type="text" id="customMines" class="dialog-text-input" size="3"> (e.g., 10-668)</p>
+            <div id="custom-settings">
+                <p><input type="checkbox" id="fillToScreen"> <label for="fillToScreen">Fill to Screen</label></p>
+                <hr>
+                <p>Rows: <input type="text" id="customRows" class="dialog-text-input" size="3"> (5-50)</p>
+                <p>Cols: <input type="text" id="customCols" class="dialog-text-input" size="3"> (5-50)</p>
+                <p>Mines: <input type="text" id="customMines" class="dialog-text-input" size="3"> (min 1, max 999)</p>
             </div>
             <hr>
-            <button id="applyOptionsNewGame">Start New Game with these Settings</button>
+            <button id="applySettingsNewGame">Start New Game with these Settings</button>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
     <script src="minesweeper.js"></script>
-    <script>
-        $(document).ready(function() {
-            const defaultHighScores = [ 
-                [999, 999, 999], [999, 999, 999], [999, 999, 999], [999, 999, 999]
-            ];
-
-            let AppSettings = {
-                gameTypeId: 1, 
-                numRows: 9,
-                numCols: 9,
-                numMines: 10,
-                presets: {
-                    1: { name: "Beginner", numRows: 9, numCols: 9, numMines: 10 },
-                    2: { name: "Intermediate", numRows: 16, numCols: 16, numMines: 40 },
-                    3: { name: "Expert", numRows: 30, numCols: 16, numMines: 99 }
-                }
-            };
-
-            function getGameSettingsForMinesweeper() {
-                return { 
-                    gameTypeId: AppSettings.gameTypeId,
-                    numRows: AppSettings.numRows,
-                    numCols: AppSettings.numCols,
-                    numMines: AppSettings.numMines
-                };
-            }
-
-            const minesweeper = new Minesweeper(defaultHighScores, getGameSettingsForMinesweeper);
-
-            function startNewGameWithCurrentAppSettings() {
-                minesweeper.newGame(null, {
-                    gameTypeId: AppSettings.gameTypeId,
-                    numRows: AppSettings.numRows,
-                    numCols: AppSettings.numCols,
-                    numMines: AppSettings.numMines
-                });
-            }
-            
-            startNewGameWithCurrentAppSettings();
-
-            $('#newGameBtn').click(function(e) { 
-                e.preventDefault(); // Prevent default anchor action
-                startNewGameWithCurrentAppSettings();
-            });
-
-            $('.dialog-close').click(function() { $(this).closest('.dialog').hide(); });
-            $('#options-link').click(function(e) { 
-                e.preventDefault(); // Prevent default anchor action
-                $('#options-dialog').show(); 
-                populateOptionsDialog(); 
-            });
-
-            function populateOptionsDialog() {
-                const currentSettings = AppSettings;
-                if (currentSettings.gameTypeId > 0 && AppSettings.presets[currentSettings.gameTypeId]) {
-                    $(`input[name="gameType"][value="${currentSettings.gameTypeId}"]`).prop('checked', true);
-                    $('#custom-settings').hide();
-                } else { 
-                    $('input[name="gameType"][value="0"]').prop('checked', true);
-                    $('#customRows').val(currentSettings.numRows);
-                    $('#customCols').val(currentSettings.numCols);
-                    $('#customMines').val(currentSettings.numMines);
-                    $('#custom-settings').show();
-                }
-            }
-
-            $('input[name="gameType"]').change(function() {
-                if ($(this).val() === "0") { 
-                    $('#custom-settings').show();
-                    const currentPresetId = AppSettings.gameTypeId;
-                    if(currentPresetId > 0 && AppSettings.presets[currentPresetId]){
-                        $('#customRows').val(AppSettings.presets[currentPresetId].numRows);
-                        $('#customCols').val(AppSettings.presets[currentPresetId].numCols);
-                        $('#customMines').val(AppSettings.presets[currentPresetId].numMines);
-                    } else { 
-                        $('#customRows').val(AppSettings.numRows);
-                        $('#customCols').val(AppSettings.numCols);
-                        $('#customMines').val(AppSettings.numMines);
-                    }
-                } else {
-                    $('#custom-settings').hide();
-                }
-            });
-
-            $('#applyOptionsNewGame').click(function() {
-                const selectedGameTypeId = parseInt($('input[name="gameType"]:checked').val());
-
-                if (selectedGameTypeId === 0) { 
-                    AppSettings.gameTypeId = 0;
-                    AppSettings.numRows = parseInt($('#customRows').val());
-                    AppSettings.numCols = parseInt($('#customCols').val());
-                    AppSettings.numMines = parseInt($('#customMines').val());
-
-                    if (isNaN(AppSettings.numRows) || AppSettings.numRows < 5 || AppSettings.numRows > 50 ||
-                        isNaN(AppSettings.numCols) || AppSettings.numCols < 5 || AppSettings.numCols > 50 ||
-                        isNaN(AppSettings.numMines) || AppSettings.numMines < 1) {
-                        alert("Invalid custom game settings. Rows/Cols (5-50), Mines (min 1).");
-                        return;
-                    }
-                    if (AppSettings.numMines >= AppSettings.numRows * AppSettings.numCols) {
-                        alert("Number of mines must be less than the total number of squares.");
-                        return;
-                    }
-                } else if (AppSettings.presets[selectedGameTypeId]) { 
-                    const preset = AppSettings.presets[selectedGameTypeId];
-                    AppSettings.gameTypeId = selectedGameTypeId;
-                    AppSettings.numRows = preset.numRows;
-                    AppSettings.numCols = preset.numCols;
-                    AppSettings.numMines = preset.numMines;
-                } else {
-                    alert("Invalid game type selected.");
-                    return;
-                }
-                
-                startNewGameWithCurrentAppSettings();
-                $('#options-dialog').hide();
-            });
-
-            $('#toggleNightModeBtn').click(function(e) {
-                e.preventDefault(); // Prevent default anchor action
-                $('body').toggleClass('night-mode');
-                if ($('body').hasClass('night-mode')) {
-                    $(this).text('Toggle Light Mode');
-                } else {
-                    $(this).text('Toggle Night Mode');
-                }
-            });
-
-            minesweeper.onWin = function(gameTypeId, time) {
-                setTimeout(function() {
-                    alert(`Congratulations! You won in ${time} seconds!`);
-                }, 100);
-            };
-             minesweeper.onNewHighScore = function(level, isOfficialRecord) { 
-             };
-
-            $('.dialog-title').on('mousedown', function(e) {
-                var $dialog = $(this).closest('.dialog');
-                if ($(e.target).is('.dialog-close')) {
-                    return;
-                }
-                var offset = $dialog.offset();
-                var relX = e.pageX - offset.left;
-                var relY = e.pageY - offset.top;
-                
-                $dialog.addClass('dragging'); 
-
-                $(document).on('mousemove.dialogDrag', function(moveEvent) {
-                    $dialog.offset({ 
-                        top: Math.max(0, moveEvent.pageY - relY), 
-                        left: Math.max(0, moveEvent.pageX - relX) 
-                    });
-                }).on('mouseup.dialogDrag', function() {
-                    $(document).off('.dialogDrag');
-                    $dialog.removeClass('dragging');
-                });
-                e.preventDefault(); 
-            });
-        });
-    </script>
-
+    
 </body>
 </html>
