@@ -4,7 +4,7 @@ A classic implementation of the Minesweeper game, designed to run locally in any
 
 ## Screenshot
 
-![Minesweeper Gameplay](assets/screenshot.png)
+![Minesweeper Gameplay](src/assets/screenshot.png)
 
 ## Features
 
