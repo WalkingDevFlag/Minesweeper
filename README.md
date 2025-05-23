@@ -26,7 +26,7 @@ The game also offers a **Night Mode** for comfortable viewing, toggled via a ded
 
    **Ensure Correct File Structure:**
     All game files are located within the `src/` directory. The expected structure is:
-    ```
+    ```bash
     minesweeper-project-root/
     ├── src/
     │   ├── index.html
