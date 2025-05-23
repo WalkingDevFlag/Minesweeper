@@ -64,7 +64,6 @@
         .night-mode #game {
             border-color: #505050 #c0c0c0 #c0c0c0 #505050; 
         }
-
     </style>
 </head>
 <body>
@@ -80,11 +79,9 @@
 
     <div id="game-container" class="z100"> 
         <div id="game">
-            {/* Minesweeper board is built here by minesweeper.js */}
         </div>
     </div>
 
-    <!-- Options Dialog -->
     <div id="options-dialog" class="dialog" style="display:none;">
         <div class="dialog-title">Game Options <span class="dialog-close">X</span></div>
         <div class="dialog-content">
@@ -104,13 +101,8 @@
         </div>
     </div>
 
-    
-
-    <!-- jQuery Core -->
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <!-- jQuery Migrate Plugin (still needed for $.browser) -->
     <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
-    <!-- Your Minesweeper Script -->
     <script src="minesweeper.js"></script>
     <script>
         $(document).ready(function() {
@@ -225,7 +217,6 @@
                 $('#options-dialog').hide();
             });
 
-            // --- Night Mode Toggle with Text Change ---
             $('#toggleNightModeBtn').click(function() {
                 $('body').toggleClass('night-mode');
                 if ($('body').hasClass('night-mode')) {
@@ -241,8 +232,8 @@
                 }, 100);
             };
              minesweeper.onNewHighScore = function(level, isOfficialRecord) { 
-                 // console.log(`New high score for level ${level}. Official: ${isOfficialRecord}`);
              };
+
             $('.dialog-title').on('mousedown', function(e) {
                 var $dialog = $(this).closest('.dialog');
                 if ($(e.target).is('.dialog-close')) {
