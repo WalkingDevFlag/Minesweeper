@@ -62,10 +62,3 @@ No build steps or local server are strictly required to run the game, as it's a 
 *   **Winning:** You win when all non-mine squares are revealed. The game will automatically flag any remaining mines.
 *   **Losing:** You lose if you click on a mine (after the first safe click).
 
-## Project History
-
-This project originated from a minified JavaScript file for a Minesweeper game. It has undergone significant refactoring to improve code readability and maintainability. Several features present in the original minified version, such as server-side high score submissions, import/export of game state, and UI zoom, have been removed to streamline it into a focused, local, single-player experience. CSS has also been cleaned up to remove styles for unused UI elements.
-
----
-
-Remember to replace `assets/screenshot.png` with an actual path to a screenshot of your game if you decide to include one!
