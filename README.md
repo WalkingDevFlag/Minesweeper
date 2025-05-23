@@ -5,7 +5,6 @@ A classic implementation of the Minesweeper game, designed to run locally in any
 ## Screenshot
 
 ![Minesweeper Gameplay](assets/screenshot.png)
-*(You should replace `assets/screenshot.png` with an actual screenshot of your game. I've assumed you'd place it in the assets folder).*
 
 ## Features
 
