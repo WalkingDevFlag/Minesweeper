@@ -1,1 +1,1073 @@
-function Minesweeper(A,Q,s){var E=this;var i;var B;var a;var m;var N;var o;var p;var K;var G;var I;var c;var U=new F();var L;var g;var M;var r;var k;var D;var e;var v;var d;var C;var y;P();this.newGame=function(ae,Y){var af,ab;var ad;var aa,ac;var Z;aa=S();Z=Q();i=Z.gameTypeId;B=Z.numRows;a=Z.numCols;m=Z.numMines;N=Z.zoom;if(Y){if(typeof Y.gameTypeId!=="undefined"){i=Y.gameTypeId}if(typeof Y.numRows!=="undefined"){B=Y.numRows}if(typeof Y.numCols!=="undefined"){a=Y.numCols}if(typeof Y.numMines!=="undefined"){m=Y.numMines}}ac=(S()!=aa);w(N);if(ac){V()}l(ae);q();p=!!ae;K=m;G=B*a-m;for(af=1;af<=B;af++){for(ab=1;ab<=a;ab++){ad=I[af][ab];if(ad.isFlagged()){ad.setClass("square bombflagged");K--}else{if(ad.isMarked()){ad.setClass("square question")}else{if(ad.isRevealed()){ad.setClass("square open"+ad.getValue());if(!ad.isHidden()){G--}}else{ad.setClass("square blank")}}}}}U.stop();if(!p){U.setTime(0)}else{if(Y&&typeof Y.time!=="undefined"){U.setTime(Y.time)}else{}}W();L=false;g=false;D=false;e=false;v=false;isMouseDownForCtrlClick=false;d=null;C=false;y=false;$("#face")[0].className="facesmile";hoveredSquareId=""};this.resize=function(Y){var Z=n(Y);w(Y);$("#game-container").removeClass("z"+N*100).addClass("z"+Y*100);$("#face").css({"margin-left":Math.floor(Z)+"px","margin-right":Math.ceil(Z)+"px"});N=Y;if(E.onResize){E.onResize()}};this.hasStartedPlaying=function(){return g};this.export_=function(){var aa=z(true);var Z=U.getTime();var Y={version:1,gameTypeId:i,numRows:B,numCols:a,numMines:m,gridObj:aa,time:Z};y=true;return btoa(JSON.stringify(Y))};this.isImportable=function(aa){try{var Y=JSON.parse(atob(aa));return Y.version===1}catch(Z){return false}};this.import_=function(ae){var aa=JSON.parse(atob(ae));var ag,Z;var af,ad;var ac=[];for(ag=0;ag<=aa.numRows+1;ag++){ac[ag]=[];for(Z=0;Z<=aa.numCols+1;Z++){af=aa.gridObj[ag][Z];if(typeof af==="number"){ad={value:af,isRevealed:false,isFlagged:false,isMarked:false}}else{ad={value:af[0],isRevealed:af[1]===1,isFlagged:af[2]===1,isMarked:af[3]===1}}ac[ag][Z]=ad}}var Y={gridObj:ac};var ab={gameTypeId:aa.gameTypeId,numRows:aa.numRows,numCols:aa.numCols,numMines:aa.numMines,time:aa.time};s({gameTypeId:aa.gameTypeId,numRows:aa.numRows,numCols:aa.numCols,numMines:aa.numMines});E.newGame(Y,ab)};function w(Y){$("#game-container, #game").width(Y*(a*16+20));$("#game").height(Y*(B*16+30+26+6))}function n(Y){return(Y*a*16-6*Math.ceil(Y*13)-Y*2*6-Y*26)/2}function S(){return B+"_"+a+"_"+m}function V(){var ab,Y;var Z=[];var aa=n(N);Z.push('<div class="bordertl"></div>');for(Y=0;Y<a;Y++){Z.push('<div class="bordertb"></div>')}Z.push('<div class="bordertr"></div>');Z.push('<div class="borderlrlong"></div>','<div class="time0" id="mines_hundreds"></div>','<div class="time0" id="mines_tens"></div>','<div class="time0" id="mines_ones"></div>','<div class="facesmile" style="margin-left:',Math.floor(aa),"px; margin-right: ",Math.ceil(aa),'px;" id="face"></div>','<div class="time0" id="seconds_hundreds"></div>','<div class="time0" id="seconds_tens"></div>','<div class="time0" id="seconds_ones"></div>','<div class="borderlrlong"></div>');Z.push('<div class="borderjointl"></div>');for(Y=0;Y<a;Y++){Z.push('<div class="bordertb"></div>')}Z.push('<div class="borderjointr"></div>');for(ab=1;ab<=B;ab++){Z.push('<div class="borderlr"></div>');for(Y=1;Y<=a;Y++){Z.push('<div class="square blank" id="',ab,"_",Y,'"></div>')}Z.push('<div class="borderlr"></div>')}Z.push('<div class="borderbl"></div>');for(Y=0;Y<a;Y++){Z.push('<div class="bordertb"></div>')}Z.push('<div class="borderbr"></div>');for(Y=0;Y<=a+1;Y++){Z.push('<div class="square blank" style="display: none;" id="',0,"_",Y,'"></div>')}for(Y=0;Y<=a+1;Y++){Z.push('<div class="square blank" style="display: none;" id="',B+1,"_",Y,'"></div>')}for(ab=1;ab<=B;ab++){Z.push('<div class="square blank" style="display: none;" id="',ab,"_",0,'"></div>');Z.push('<div class="square blank" style="display: none;" id="',ab,"_",a+1,'"></div>')}$("#game").html(Z.join(""))}function u(ad,Z){var ab=0;var aa=false;var Y=false;var ac=false;this.addToValue=function(ae){ab+=ae};this.isMine=function(){return ab<0};this.isFlagged=function(){return aa};this.isMarked=function(){return Y};this.isRevealed=function(){return ac};this.isHidden=function(){return ad<1||ad>B||Z<1||Z>a};this.getRow=function(){return ad};this.getCol=function(){return Z};this.getValue=function(){return ab};this.setRevealed=function(ae){ac=ae};this.plantMine=function(){ab-=10;I[ad-1][Z-1].addToValue(1);I[ad-1][Z].addToValue(1);I[ad-1][Z+1].addToValue(1);I[ad][Z-1].addToValue(1);I[ad][Z+1].addToValue(1);I[ad+1][Z-1].addToValue(1);I[ad+1][Z].addToValue(1);I[ad+1][Z+1].addToValue(1)};this.unplantMine=function(){ab+=10;I[ad-1][Z-1].addToValue(-1);I[ad-1][Z].addToValue(-1);I[ad-1][Z+1].addToValue(-1);I[ad][Z-1].addToValue(-1);I[ad][Z+1].addToValue(-1);I[ad+1][Z-1].addToValue(-1);I[ad+1][Z].addToValue(-1);I[ad+1][Z+1].addToValue(-1)};this.setClass=function(ae){document.getElementById(ad+"_"+Z).className=ae};this.reveal1=function(){var ae,af;var ag,ah;var ai=[];ai.push(this);this.pushed=true;while(ai.length>0){ag=ai.pop();if(!ag.isRevealed()&&!ag.isFlagged()){if(ag.isMine()){return false}else{if(!ag.isFlagged()){ag.setClass("square open"+ag.getValue());ag.setRevealed(true);if(!ag.isHidden()&&--G==0){J();return true}if(ag.getValue()==0&&!ag.isHidden()){for(ae=-1;ae<=1;ae++){for(af=-1;af<=1;af++){ah=I[ag.getRow()+ae][ag.getCol()+af];if(!ah.pushed&&!ah.isHidden()&&!ah.isRevealed()){ai.push(ah);ah.pushed=true}}}}}}}}q();return true};this.reveal9=function(){if(ac){var af,ag;var ah;var ai=0;var ae=[];for(af=-1;af<=1;af++){for(ag=-1;ag<=1;ag++){ah=I[ad+af][Z+ag];if(ah!=this&&ah.isFlagged()){ai++}}}if(ai==ab){for(af=-1;af<=1;af++){for(ag=-1;ag<=1;ag++){ah=I[ad+af][Z+ag];if(ah!=this&&!ah.reveal1()){ae.push(ah)}}}if(ae.length>0){R(ae)}else{q()}}}};this.flag=function(ae){if(!ac){if(aa){if($("#marks").attr("checked")){this.setClass("square question");Y=true}else{this.setClass("square blank");if(ae){this._showFlagAnimation(true)}}aa=false;K++;W()}else{if(Y){this.setClass("square blank");Y=false}else{this.setClass("square bombflagged");aa=true;K--;W();if(ae){this._showFlagAnimation()}}}q()}};this._showFlagAnimation=function(af){var al=$("#"+ad+"_"+Z);var ag=al.offset();var aj=ag.left+al.width()/2;var ai=ag.top+al.height()/2;var ao=57*N*1.75;var ah=79*N*1.75;var ae={left:aj-ao/2,top:ai-ah/2,width:ao+"px",height:ah+"px",opacity:0};var am={left:aj,top:ai,width:0,height:0,opacity:1};if(af){var an=ae;ae=am;am=an}var ak=$('<img src="flag.png" class="flag-animation"></div>').css(ae);$("body").append(ak);setTimeout(function(){ak.css(am)},0);setTimeout(function(){ak.remove()},500)};this.serializeToObj=function(ae){if(ae){if(!ac&&!aa&&!Y){return ab}else{return[ab,ac?1:0,aa?1:0,Y?1:0]}}else{return{value:ab,isRevealed:ac,isFlagged:aa,isMarked:Y}}};this.deserializeFromObj=function(ae){ab=ae.value;aa=ae.isFlagged;Y=ae.isMarked;ac=ae.isRevealed}}function l(ab){var ad,Y,Z;var aa;I=[];c=[];M=[];Z=0;for(ad=0;ad<=B+1;ad++){I[ad]=[];for(Y=0;Y<=a+1;Y++){aa=new u(ad,Y);I[ad][Y]=aa;c[ad+"_"+Y]=aa;if(!aa.isHidden()){M[Z++]=aa}}}if(ab){var ac=ab.gridObj;for(ad=0;ad<=B+1;ad++){for(Y=0;Y<=a+1;Y++){I[ad][Y].deserializeFromObj(ac[ad][Y])}}M=[];for(ad=0;ad<=B+1;ad++){for(Y=0;Y<=a+1;Y++){aa=I[ad][Y];if(!aa.isHidden()&&!aa.isMine()){M.push(aa)}}}}else{for(Z=0;Z<m;Z++){M.splice(Math.floor(Math.random()*M.length),1)[0].plantMine()}}}function z(Z){var aa=[];var ab,Y;for(ab=0;ab<=B+1;ab++){aa[ab]=[];for(Y=0;Y<=a+1;Y++){aa[ab][Y]=I[ab][Y].serializeToObj(Z)}}return aa}function q(){var Y=z();o={gridObj:Y}}function t(ag){var Y=ag.getRow();var ae=ag.getCol();var ad,Z;var ac;var af;var aa;if(!p&&!y){if(ag.isMine()){M.splice(Math.floor(Math.random()*M.length),1)[0].plantMine();ag.unplantMine();M.push(ag)}var af=[];for(var ab=0;ab<M.length;ab++){aa=M[ab];if(aa.getRow()<Y-1||aa.getRow()>Y+1||aa.getCol()<ae-1||aa.getCol()>ae+1){af.push(aa)}}for(ad=-1;ad<=1;ad++){for(Z=-1;Z<=1;Z++){ac=I[Y+ad][ae+Z];if(ac.isMine()&&af.length>0){af.splice(Math.floor(Math.random()*af.length),1)[0].plantMine();ac.unplantMine()}}}}U.start();if((Y==1&&ae==1)||(Y==1&&ae==a)||(Y==B&&ae==1)||(Y==B&&ae==a)){return 1}else{if(Y==1||Y==B||ae==1||ae==a){return 2}else{return 3}}}function X(Y){if(i>0){j();$.post("start.php",{key:r,s:Y})}}function j(){var Y="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";var Z;r="";for(var Z=0;Z<3;Z++){r+=Y.charAt(Math.floor(Math.random()*Y.length))}r+=4*(Math.floor(Math.random()*225)+25)+i;for(var Z=0;Z<4;Z++){r+=Y.charAt(Math.floor(Math.random()*Y.length))}}function F(){var aa;var ab;var ac;function Z(){var ag=new Date().getTime();var ad=ab*1000;var af=ag-aa;var ae=1000-(af-ad);ac=setTimeout(Z,ae);ab++;Y()}function Y(){var ad=x(ab);document.getElementById("seconds_hundreds").className="time"+ad[0];document.getElementById("seconds_tens").className="time"+ad[1];document.getElementById("seconds_ones").className="time"+ad[2]}this.start=function(){aa=new Date().getTime()-ab*1000;Z()};this.stop=function(){clearTimeout(ac)};this.getTime=function(){return ab};this.setTime=function(ad){ab=ad;Y()}}function W(){var Y=x(K);document.getElementById("mines_hundreds").className="time"+Y[0];document.getElementById("mines_tens").className="time"+Y[1];document.getElementById("mines_ones").className="time"+Y[2]}function x(Y){Y=Math.min(Y,999);if(Y>=0){return[Math.floor(Y/100),Math.floor((Y%100)/10),Y%10]}else{return["-",Math.floor((-Y%100)/10),-Y%10]}}function R(Y){var ac,Z,aa;var ab;document.getElementById("face").className="facedead";U.stop();L=true;for(ac=1;ac<=B;ac++){columnloop:for(Z=1;Z<=a;Z++){ab=I[ac][Z];if(!ab.isRevealed()){for(aa=0;aa<Y.length;aa++){if(ab==Y[aa]){ab.setClass("square bombdeath");continue columnloop}}if(ab.isMine()&&!ab.isFlagged()){ab.setClass("square bombrevealed")}else{if(!ab.isMine()&&ab.isFlagged()){ab.setClass("square bombmisflagged")}}}}}}function J(){var ad,Y;var aa;var Z;var ab;var ac=false;document.getElementById("face").className="facewin";U.stop();L=true;K=0;W();for(ad=1;ad<=B;ad++){for(Y=1;Y<=a;Y++){aa=I[ad][Y];if(!aa.isRevealed()&&!aa.isFlagged()){aa.setClass("square bombflagged")}}}if(i>0){ab=U.getTime();if(!p){for(Z=3;Z>=0;Z--){if(ab<=A[Z][i-1]){H(Z+1,true);ac=true;break}}if(!ac&&((i==1&&ab<=10)||(i==2&&ab<=50)||(i==3&&ab<=150))){H(1,false)}}if(E.onWin){E.onWin(i,ab)}}}function H(ab,ae){var Y;var Z,ac;var aa=(new Date()).getTime();var ad;switch(ab){case 1:Y="daily";break;case 2:Y="weekly";break;case 3:Y="monthly";break;case 4:Y="all-time";break;default:Y="";break}ac=(O()&&!!localStorage.name)?localStorage.name:"";if(ae){Z=prompt(U.getTime()+" is a new "+Y+" high score! Please enter your name",ac)}else{Z=prompt("Please enter your name to submit your score ("+U.getTime()+")",ac)}Z=$.trim(Z).substring(0,25);if(Z&&O()){localStorage.name=Z}ad=Math.round(((new Date()).getTime()-aa)/1000);$.post("win.php",{key:r,name:Z,time:U.getTime(),s:ad,i:ab,h:ae?1:0},function(af){if(ae&&E.onNewHighScore){E.onNewHighScore(ab)}})}function O(){try{return"localStorage" in window&&window.localStorage!==null}catch(Y){return false}}function T(Y){return Y.className.substring(0,6)=="square"}function f(Z){var Y={};if(k){Y.left=Z.button==1||Z.button==3||Z.button==4;Y.right=Z.button==2||Z.button==3||Z.button==4}else{Y.left=Z.button==0||Z.button==1;Y.right=Z.button==2||Z.button==1}return Y}function h(aa,Z,Y){if(!aa.isRevealed()){if(aa.isMarked()){aa.setClass(Y)}else{if(!aa.isFlagged()){aa.setClass(Z)}}}}function b(ac,ab,aa){var Y,Z;for(Y=-1;Y<=1;Y++){for(Z=-1;Z<=1;Z++){h(I[ac.getRow()+Y][ac.getCol()+Z],ab,aa)}}}function P(){var aa=false;var ac;function Z(ag){if(ag.type==="touchmove"&&!ae(ag)){return}var af=Y(ag);if(af!=ac&&!D){if(v){if(ac){b(c[ac.id],"square blank","square question")}if(T(af)){b(c[af.id],"square open0","square questionpressed")}}else{if(ac){h(c[ac.id],"square blank","square question")}if(T(af)){h(c[af.id],"square open0","square questionpressed")}}}ac=(T(af))?af:undefined}function ad(ag){if(ag.type==="touchmove"&&!ae(ag)){return}var af=Y(ag);document.getElementById("face").className=(af.id=="face")?"facepressed":"facesmile"}function Y(af){if(af.type==="touchmove"||af.type==="touchend"){var ag=af.originalEvent.changedTouches[0];return document.elementFromPoint(ag.clientX,ag.clientY)}else{return af.target}}function ae(af){if(d===null){return false}var ag=(af.originalEvent.changedTouches[0].identifier===d);return ag}k=$.browser.msie&&parseFloat($.browser.version)<=7;$(document).bind("gesturestart",function(af){C=true;ab()});$(document).bind("gestureend",function(af){C=false});$(document).bind("scroll",ab);function ab(){if(d===null){return}d=null;if(ac){h(c[ac.id],"square blank","square question");ac=undefined}if(!L){document.getElementById("face").className="facesmile"}}$(document).bind("touchstart",function(ah){$(document).unbind("mousedown").unbind("mouseup");if(d||C){return}d=ah.originalEvent.changedTouches[0].identifier;if(T(ah.target)&&!L){var ag=d;var af=ah.target;setTimeout(function(){if(ag===d&&af===ac){c[af.id].flag(true);d=null;document.getElementById("face").className="facesmile"}},500);$(document).bind("touchmove",Z);document.getElementById("face").className="faceooh";ac=undefined;Z(ah)}else{if(ah.target.id=="face"){aa=true;$(document).bind("touchmove",Z);document.getElementById("face").className="facepressed"}}});$(document).bind("touchend",function(ag){if(!ae(ag)){return}d=null;$(document).unbind("touchmove",Z).unbind("touchmove",ad);if(aa||!L){document.getElementById("face").className="facesmile"}var af=Y(ag);if(T(af)&&!L){square=c[af.id];if(!g){squareTypeId=t(square)}if(square.isRevealed()){square.reveal9()}else{if(square.isFlagged()){square.flag(true)}else{if(!square.reveal1()){R([square])}if(!g){X(squareTypeId);g=true}}}ag.preventDefault()}else{if(af.id=="face"&&aa){E.newGame()}}aa=false});$(document).mousedown(function(ag){var af=f(ag);e=af.left||e;v=af.right||v;if(ag.ctrlKey&&T(ag.target)&&!L){c[ag.target.id].flag();isMouseDownForCtrlClick=true}else{if(e){if(T(ag.target)&&!L){ag.preventDefault();$(document).bind("mousemove",Z);document.getElementById("face").className="faceooh";ac=undefined;Z(ag)}else{if(ag.target.id=="face"){ag.preventDefault();aa=true;$(document).bind("mousemove",ad);document.getElementById("face").className="facepressed"}}}else{if(v){if(T(ag.target)&&!L){c[ag.target.id].flag()}return false}}}});$(document).on("contextmenu",function(ag){var af=$(ag.target);if(af.is("#game")||af.closest("#game").length>0){return}v=false});$(document).mouseup(function(ai){var af=f(ai);var ah;var ag;if(isMouseDownForCtrlClick){e=false;v=false;isMouseDownForCtrlClick=false;return}if(af.left){e=false;$(document).unbind("mousemove",Z).unbind("mousemove",ad);if(aa||!L){document.getElementById("face").className="facesmile"}if(T(ai.target)&&!L){ah=c[ai.target.id];if(v){D=true;b(c[ai.target.id],"square blank","square question");ah.reveal9()}else{if(!D){if(!g){ag=t(ah)}if(!ah.reveal1()){R([ah])}if(!g){X(ag);g=true}}D=false}}else{if(ai.target.id=="face"&&aa){E.newGame()}}aa=false}if(af.right){v=false;if(T(ai.target)&&!L){if(e){ah=c[ai.target.id];D=true;b(ah,"square blank","square question");ah.reveal9()}else{D=false}if(!L){document.getElementById("face").className="facesmile"}}}});$(document).keydown(function(ag){if(ag.which==113){E.newGame()}else{if(ag.which==32){if(hoveredSquareId&&!L){square=c[hoveredSquareId];if(square.isRevealed()){square.reveal9()}else{square.flag()}}ag.preventDefault()}else{if(ag.which==90&&!ag.shiftKey&&af()){if(document.getElementById("face").className=="facedead"){E.newGame(o)}}}}function af(){var ah=window.navigator&&window.navigator.platform&&window.navigator.platform.toLowerCase().indexOf("mac")!==-1;if(ah){return ag.metaKey}else{return ag.ctrlKey}}});$("#game").mouseover(function(af){if(T(af.target)){hoveredSquareId=af.target.id}});$("#game").mouseout(function(af){if(T(af.target)){if(hoveredSquareId=af.target.id){hoveredSquareId=""}}})}};
+// Minesweeper Game Logic
+// Original Author: Unknown (from minified source)
+// De-obfuscated and Refactored for Readability
+
+function Minesweeper(initialHighScores, getGameSettingsCallback) {
+    var self = this; // Reference to the Minesweeper instance
+
+    // Game state variables
+    var gameTypeId;
+    var numRows;
+    var numCols;
+    var numMines;
+    var zoomFactor; 
+    var lastGoodGridState; 
+    var isRestoredGame; 
+    var minesLeftToFlag;
+    var squaresLeftToReveal;
+    var gameGrid; 
+    var squareCacheById; 
+
+    var timer = new Timer(); 
+
+    // UI/Interaction state variables
+    var isGameOver;
+    var hasGameStartedPlaying; 
+    var nonMineSquaresList; 
+    var gameKeyForServer; 
+    var isIE7OrLess; 
+
+    var isChordInProgress; 
+    var isLeftMouseDown;
+    var isRightMouseDown;
+    var activeTouchIdentifier;
+    var isGestureInProgress; 
+    var isMouseDownForCtrlClick = false; 
+    
+    var hoveredSquareId = ""; 
+
+    initializeEventHandlers(); 
+
+    this.newGame = function(restoredGridData, newGameSettings) {
+        var prevGridSignature, currentGridSignature;
+        var currentSettings = getGameSettingsCallback();
+
+        prevGridSignature = getGridConfigSignature(); 
+
+        gameTypeId = currentSettings.gameTypeId;
+        numRows = currentSettings.numRows;
+        numCols = currentSettings.numCols;
+        numMines = currentSettings.numMines;
+        zoomFactor = 1; 
+
+        if (newGameSettings) {
+            if (typeof newGameSettings.gameTypeId !== "undefined") gameTypeId = newGameSettings.gameTypeId;
+            if (typeof newGameSettings.numRows !== "undefined") numRows = newGameSettings.numRows;
+            if (typeof newGameSettings.numCols !== "undefined") numCols = newGameSettings.numCols;
+            if (typeof newGameSettings.numMines !== "undefined") numMines = newGameSettings.numMines;
+        }
+
+        currentGridSignature = getGridConfigSignature();
+        var boardConfigChanged = (prevGridSignature !== currentGridSignature);
+
+        updateGameContainerSize(); 
+
+        if (boardConfigChanged) {
+            buildGameBoardUI(); 
+        }
+
+        initializeGridAndMines(restoredGridData);
+        saveCurrentGridState(); 
+
+        isRestoredGame = !!restoredGridData;
+        minesLeftToFlag = numMines;
+        squaresLeftToReveal = numRows * numCols - numMines;
+
+        for (var r = 1; r <= numRows; r++) {
+            for (var c = 1; c <= numCols; c++) {
+                var square = gameGrid[r][c];
+                if (square.isFlagged()) {
+                    square.setClass("square bombflagged");
+                    minesLeftToFlag--;
+                } else if (square.isMarked()) { 
+                    square.setClass("square question");
+                } else if (square.isRevealed()) {
+                    square.setClass("square open" + square.getValue());
+                    if (!square.isHidden()) { 
+                        squaresLeftToReveal--;
+                    }
+                } else {
+                    square.setClass("square blank");
+                }
+            }
+        }
+
+        timer.stop();
+        if (!isRestoredGame) {
+            timer.setTime(0);
+        } else {
+            if (newGameSettings && typeof newGameSettings.time !== "undefined") {
+                timer.setTime(newGameSettings.time);
+            }
+        }
+        updateMinesLeftDisplay();
+
+        isGameOver = false;
+        hasGameStartedPlaying = false; 
+        isChordInProgress = false;
+        isLeftMouseDown = false;
+        isRightMouseDown = false;
+        activeTouchIdentifier = null;
+        isGestureInProgress = false;
+        isMouseDownForCtrlClick = false; 
+        
+        if(document.getElementById("face")) $("#face")[0].className = "facesmile"; // Check if face exists
+        hoveredSquareId = "";
+    };
+
+    this.hasStartedPlaying = function() {
+        return hasGameStartedPlaying;
+    };
+
+    function updateGameContainerSize() {
+        var effectiveZoom = 1; 
+        $("#game-container, #game").width(effectiveZoom * (numCols * 16 + 20));
+        $("#game").height(effectiveZoom * (numRows * 16 + 30 + 26 + 6));
+    }
+
+    function calculateFaceMargin() {
+        var effectiveZoom = 1;
+        return (effectiveZoom * numCols * 16 - 6 * Math.ceil(effectiveZoom * 13) - effectiveZoom * 2 * 6 - effectiveZoom * 26) / 2;
+    }
+
+    function getGridConfigSignature() {
+        if (typeof numRows === 'undefined') return ""; 
+        return numRows + "_" + numCols + "_" + numMines;
+    }
+
+    function buildGameBoardUI() {
+        var r, c;
+        var htmlParts = [];
+        var faceMargin = calculateFaceMargin();
+
+        htmlParts.push('<div class="bordertl"></div>');
+        for (c = 0; c < numCols; c++) { htmlParts.push('<div class="bordertb"></div>'); }
+        htmlParts.push('<div class="bordertr"></div>');
+
+        htmlParts.push('<div class="borderlrlong"></div>'); 
+        htmlParts.push('<div class="time0" id="mines_hundreds"></div>');
+        htmlParts.push('<div class="time0" id="mines_tens"></div>');
+        htmlParts.push('<div class="time0" id="mines_ones"></div>');
+        htmlParts.push('<div class="facesmile" style="margin-left:', Math.floor(faceMargin), 'px; margin-right:', Math.ceil(faceMargin), 'px;" id="face"></div>');
+        htmlParts.push('<div class="time0" id="seconds_hundreds"></div>');
+        htmlParts.push('<div class="time0" id="seconds_tens"></div>');
+        htmlParts.push('<div class="time0" id="seconds_ones"></div>');
+        htmlParts.push('<div class="borderlrlong"></div>'); 
+
+        htmlParts.push('<div class="borderjointl"></div>');
+        for (c = 0; c < numCols; c++) { htmlParts.push('<div class="bordertb"></div>'); }
+        htmlParts.push('<div class="borderjointr"></div>');
+
+        for (r = 1; r <= numRows; r++) {
+            htmlParts.push('<div class="borderlr"></div>'); 
+            for (c = 1; c <= numCols; c++) {
+                htmlParts.push('<div class="square blank" id="', r, "_", c, '"></div>');
+            }
+            htmlParts.push('<div class="borderlr"></div>'); 
+        }
+
+        htmlParts.push('<div class="borderbl"></div>');
+        for (c = 0; c < numCols; c++) { htmlParts.push('<div class="bordertb"></div>'); }
+        htmlParts.push('<div class="borderbr"></div>');
+
+        for (c = 0; c <= numCols + 1; c++) { htmlParts.push('<div class="square blank" style="display: none;" id="', 0, "_", c, '"></div>'); }
+        for (c = 0; c <= numCols + 1; c++) { htmlParts.push('<div class="square blank" style="display: none;" id="', numRows + 1, "_", c, '"></div>'); }
+        for (r = 1; r <= numRows; r++) {
+            htmlParts.push('<div class="square blank" style="display: none;" id="', r, "_", 0, '"></div>');
+            htmlParts.push('<div class="square blank" style="display: none;" id="', r, "_", numCols + 1, '"></div>');
+        }
+        $("#game").html(htmlParts.join(""));
+    }
+
+    function Square(row, col) {
+        var value = 0;          
+        var isFlaggedSquare = false;
+        var isMarkedSquare = false;   
+        var isRevealedSquare = false;
+
+        this.addToValue = function(amount) { value += amount; };
+        this.isMine = function() { return value < 0; };
+        this.isFlagged = function() { return isFlaggedSquare; };
+        this.isMarked = function() { return isMarkedSquare; };
+        this.isRevealed = function() { return isRevealedSquare; };
+        this.isHidden = function() { 
+            return row < 1 || row > numRows || col < 1 || col > numCols;
+        };
+        this.getRow = function() { return row; };
+        this.getCol = function() { return col; };
+        this.getValue = function() { return value; };
+        this.setRevealed = function(revealed) { isRevealedSquare = revealed; };
+
+        this.plantMine = function() {
+            value -= 10; 
+            for (var dr = -1; dr <= 1; dr++) {
+                for (var dc = -1; dc <= 1; dc++) {
+                    if (dr === 0 && dc === 0) continue;
+                    if(gameGrid[row + dr] && gameGrid[row + dr][col + dc]) { // Boundary check
+                        gameGrid[row + dr][col + dc].addToValue(1);
+                    }
+                }
+            }
+        };
+
+        this.unplantMine = function() {
+            value += 10; 
+            for (var dr = -1; dr <= 1; dr++) {
+                for (var dc = -1; dc <= 1; dc++) {
+                    if (dr === 0 && dc === 0) continue;
+                     if(gameGrid[row + dr] && gameGrid[row + dr][col + dc]) { // Boundary check
+                        gameGrid[row + dr][col + dc].addToValue(-1);
+                    }
+                }
+            }
+        };
+
+        this.setClass = function(className) {
+            var el = document.getElementById(row + "_" + col);
+            if (el) el.className = className;
+        };
+
+        this.reveal1 = function() { 
+            var squaresToProcess = [];
+            var currentSquare, neighborSquare;
+            var cascadeMarkers = new Set();
+
+            function markForCascade(sq) {
+                cascadeMarkers.add(sq.getRow() + "_" + sq.getCol());
+            }
+            function isMarkedForCascade(sq) {
+                return cascadeMarkers.has(sq.getRow() + "_" + sq.getCol());
+            }
+
+            squaresToProcess.push(this);
+            markForCascade(this);
+
+            while (squaresToProcess.length > 0) {
+                currentSquare = squaresToProcess.pop();
+                if (!currentSquare.isRevealed() && !currentSquare.isFlagged()) {
+                    if (currentSquare.isMine()) {
+                        return false; 
+                    } else {
+                        currentSquare.setClass("square open" + currentSquare.getValue());
+                        currentSquare.setRevealed(true);
+
+                        if (!currentSquare.isHidden()) { 
+                           if (--squaresLeftToReveal === 0) {
+                                handleWin();
+                                return true; 
+                           }
+                        }
+
+                        if (currentSquare.getValue() === 0 && !currentSquare.isHidden()) {
+                            for (var dr = -1; dr <= 1; dr++) {
+                                for (var dc = -1; dc <= 1; dc++) {
+                                    if (gameGrid[currentSquare.getRow() + dr] && gameGrid[currentSquare.getRow() + dr][currentSquare.getCol() + dc]) {
+                                        neighborSquare = gameGrid[currentSquare.getRow() + dr][currentSquare.getCol() + dc];
+                                        if (!isMarkedForCascade(neighborSquare) && !neighborSquare.isHidden() && !neighborSquare.isRevealed()) {
+                                            squaresToProcess.push(neighborSquare);
+                                            markForCascade(neighborSquare);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            saveCurrentGridState();
+            return true; 
+        };
+
+        this.reveal9 = function() { 
+            if (isRevealedSquare) {
+                var flaggedNeighbors = 0;
+                var minesHitDuringChord = [];
+                var neighborSquare;
+
+                for (var dr = -1; dr <= 1; dr++) {
+                    for (var dc = -1; dc <= 1; dc++) {
+                        if (dr === 0 && dc === 0) continue;
+                        if (gameGrid[row + dr] && gameGrid[row + dr][col + dc]) {
+                            neighborSquare = gameGrid[row + dr][col + dc];
+                            if (neighborSquare.isFlagged()) {
+                                flaggedNeighbors++;
+                            }
+                        }
+                    }
+                }
+
+                if (flaggedNeighbors === value) { 
+                    for (var dr = -1; dr <= 1; dr++) {
+                        for (var dc = -1; dc <= 1; dc++) {
+                             if (dr === 0 && dc === 0) continue;
+                            if (gameGrid[row + dr] && gameGrid[row + dr][col + dc]) {
+                                neighborSquare = gameGrid[row + dr][col + dc];
+                                if (!neighborSquare.isFlagged() && !neighborSquare.isHidden()) { 
+                                    if (!neighborSquare.reveal1()) { 
+                                        minesHitDuringChord.push(neighborSquare); 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (minesHitDuringChord.length > 0) {
+                        handleLoss(minesHitDuringChord); 
+                    } else {
+                        saveCurrentGridState();
+                    }
+                }
+            }
+        };
+
+        this.flag = function(useAnimation) {
+            if (!isRevealedSquare) {
+                var useQuestionMarks = false; 
+
+                if (isFlaggedSquare) { 
+                    if (useQuestionMarks) { 
+                        this.setClass("square question");
+                        isMarkedSquare = true;
+                    } else {
+                        this.setClass("square blank");
+                        if (useAnimation) { this._showFlagAnimation(true); } 
+                    }
+                    isFlaggedSquare = false;
+                    minesLeftToFlag++;
+                    updateMinesLeftDisplay();
+                } else if (isMarkedSquare) { 
+                    this.setClass("square blank");
+                    isMarkedSquare = false;
+                } else { 
+                    this.setClass("square bombflagged");
+                    isFlaggedSquare = true;
+                    minesLeftToFlag--;
+                    updateMinesLeftDisplay();
+                    if (useAnimation) { this._showFlagAnimation(false); } 
+                }
+                saveCurrentGridState();
+            }
+        };
+
+        this._showFlagAnimation = function(isUnflagging) {
+            var $squareEl = $("#" + row + "_" + col);
+            if (!$squareEl.length) return; // Element doesn't exist
+            var offset = $squareEl.offset();
+            var centerX = offset.left + $squareEl.width() / 2;
+            var centerY = offset.top + $squareEl.height() / 2;
+
+            var animZoom = 1; 
+            var flagWidth = 57 * animZoom * 1.75;
+            var flagHeight = 79 * animZoom * 1.75;
+
+            var startCss = {
+                left: centerX - flagWidth / 2,
+                top: centerY - flagHeight / 2,
+                width: flagWidth + "px",
+                height: flagHeight + "px",
+                opacity: 0
+            };
+            var endCss = {
+                left: centerX,
+                top: centerY,
+                width: 0,
+                height: 0,
+                opacity: 1
+            };
+
+            if (isUnflagging) { 
+                var temp = startCss;
+                startCss = endCss;
+                endCss = temp;
+            }
+            // *** UPDATED PATH HERE ***
+            var $animImg = $('<img src="asset/flag.png" class="flag-animation"></div>').css(startCss);
+            $("body").append($animImg);
+            setTimeout(function() { $animImg.css(endCss); }, 0); 
+            setTimeout(function() { $animImg.remove(); }, 500); 
+        };
+        
+        this.serializeToObj = function(useCompactFormat) {
+            if (useCompactFormat) {
+                if (!isRevealedSquare && !isFlaggedSquare && !isMarkedSquare) {
+                    return value; 
+                } else {
+                    return [value, isRevealedSquare ? 1 : 0, isFlaggedSquare ? 1 : 0, isMarkedSquare ? 1 : 0];
+                }
+            } else {
+                return { value: value, isRevealed: isRevealedSquare, isFlagged: isFlaggedSquare, isMarked: isMarkedSquare };
+            }
+        };
+
+        this.deserializeFromObj = function(objData) {
+            value = objData.value;
+            isFlaggedSquare = objData.isFlagged;
+            isMarkedSquare = objData.isMarked;
+            isRevealedSquare = objData.isRevealed;
+        };
+    }
+
+    function initializeGridAndMines(restoredGridData) {
+        var r, c, i;
+        var square;
+
+        gameGrid = [];
+        squareCacheById = {};
+        nonMineSquaresList = []; 
+
+        var currentSquareIndex = 0;
+        for (r = 0; r <= numRows + 1; r++) { 
+            gameGrid[r] = [];
+            for (c = 0; c <= numCols + 1; c++) { 
+                square = new Square(r, c);
+                gameGrid[r][c] = square;
+                squareCacheById[r + "_" + c] = square;
+                if (!square.isHidden()) { 
+                    nonMineSquaresList[currentSquareIndex++] = square;
+                }
+            }
+        }
+
+        if (restoredGridData) { 
+            var loadedGrid = restoredGridData.gridObj;
+            for (r = 0; r <= numRows + 1; r++) {
+                for (c = 0; c <= numCols + 1; c++) {
+                    gameGrid[r][c].deserializeFromObj(loadedGrid[r][c]);
+                }
+            }
+            nonMineSquaresList = [];
+            for (r = 0; r <= numRows + 1; r++) {
+                for (c = 0; c <= numCols + 1; c++) {
+                    square = gameGrid[r][c];
+                    if (!square.isHidden() && !square.isMine()) {
+                        nonMineSquaresList.push(square);
+                    }
+                }
+            }
+        } else { 
+            for (i = 0; i < numMines; i++) {
+                if(nonMineSquaresList.length > 0) { // Ensure list is not empty
+                    var mineToPlant = nonMineSquaresList.splice(Math.floor(Math.random() * nonMineSquaresList.length), 1)[0];
+                    mineToPlant.plantMine();
+                } else {
+                    // console.warn("Not enough non-mine squares to place all mines.");
+                    break; 
+                }
+            }
+        }
+    }
+
+    function serializeGridToArray(useCompactFormat) {
+        var serialized = [];
+        for (var r = 0; r <= numRows + 1; r++) {
+            serialized[r] = [];
+            for (var c = 0; c <= numCols + 1; c++) {
+                serialized[r][c] = gameGrid[r][c].serializeToObj(useCompactFormat);
+            }
+        }
+        return serialized;
+    }
+
+    function saveCurrentGridState() { 
+        var gridState = serializeGridToArray(false); 
+        lastGoodGridState = { gridObj: gridState };
+    }
+
+    function handleFirstClickSafety(clickedSquare) {
+        var r = clickedSquare.getRow();
+        var c = clickedSquare.getCol();
+        var dr, dc, neighborSquare;
+        var safeNonMineSquares = []; 
+
+        if (!isRestoredGame) { 
+            if (clickedSquare.isMine()) {
+                var randomNonMineSquare = nonMineSquaresList[Math.floor(Math.random() * nonMineSquaresList.length)];
+                if (randomNonMineSquare && randomNonMineSquare !== clickedSquare) { 
+                    randomNonMineSquare.plantMine(); 
+                    clickedSquare.unplantMine(); 
+                    nonMineSquaresList.push(clickedSquare);
+                    var idx = nonMineSquaresList.indexOf(randomNonMineSquare);
+                    if (idx > -1) nonMineSquaresList.splice(idx, 1);
+                } else if (nonMineSquaresList.length > 0 && nonMineSquaresList[0] !== clickedSquare) {
+                    // Fallback if random pick was the clicked square itself (and there are other options)
+                    nonMineSquaresList[0].plantMine();
+                    clickedSquare.unplantMine();
+                    nonMineSquaresList.push(clickedSquare);
+                    nonMineSquaresList.splice(0,1);
+                } else {
+                    // console.warn("Could not find a suitable non-mine square to move the initial mine to.");
+                }
+            }
+            
+            // Re-filter nonMineSquaresList for the 3x3 safety logic
+            safeNonMineSquares = [];
+            for (var i = 0; i < nonMineSquaresList.length; i++) {
+                var sq = nonMineSquaresList[i];
+                 // Ensure sq is not the clicked square or its direct neighbors for moving mines from the 3x3 area
+                if ( !(sq.getRow() >= r - 1 && sq.getRow() <= r + 1 && sq.getCol() >= c - 1 && sq.getCol() <= c + 1) ) {
+                    safeNonMineSquares.push(sq);
+                }
+            }
+
+            for (dr = -1; dr <= 1; dr++) {
+                for (dc = -1; dc <= 1; dc++) {
+                    if (gameGrid[r + dr] && gameGrid[r + dr][c + dc]) {
+                        neighborSquare = gameGrid[r + dr][c + dc];
+                        if (neighborSquare.isMine() && safeNonMineSquares.length > 0) {
+                            var newMineLocation = safeNonMineSquares.splice(Math.floor(Math.random() * safeNonMineSquares.length), 1)[0];
+                            newMineLocation.plantMine();
+                            neighborSquare.unplantMine();
+                            nonMineSquaresList.push(neighborSquare); // Add now non-mine square back
+                            var idxNew = nonMineSquaresList.indexOf(newMineLocation); // Remove the new mine location
+                            if(idxNew > -1) nonMineSquaresList.splice(idxNew, 1);
+                        }
+                    }
+                }
+            }
+        }
+        
+        timer.start(); 
+        
+        if ((r === 1 && c === 1) || (r === 1 && c === numCols) || (r === numRows && c === 1) || (r === numRows && c === numCols)) {
+            return 1; 
+        } else if (r === 1 || r === numRows || c === 1 || c === numCols) {
+            return 2; 
+        } else {
+            return 3; 
+        }
+    }
+    
+    function sendStartGameSignalToServer(squareType) { 
+        if (gameTypeId > 0) { 
+            generateGameKeyForServer();
+            // $.post("start.php", { key: gameKeyForServer, s: squareType }); 
+        }
+    }
+
+    function generateGameKeyForServer() {
+        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var i;
+        gameKeyForServer = "";
+        for (i = 0; i < 3; i++) { gameKeyForServer += chars.charAt(Math.floor(Math.random() * chars.length)); }
+        gameKeyForServer += 4 * (Math.floor(Math.random() * 225) + 25) + gameTypeId; 
+        for (i = 0; i < 4; i++) { gameKeyForServer += chars.charAt(Math.floor(Math.random() * chars.length)); }
+    }
+
+    function Timer() {
+        var timerStartTime;     
+        var totalElapsedTimeSeconds = 0; 
+        var timerIntervalId;
+
+        function tick() {
+            var expectedElapsedTimeMs = totalElapsedTimeSeconds * 1000;
+            var actualTimePassedMs = new Date().getTime() - timerStartTime;
+            var driftMs = actualTimePassedMs - expectedElapsedTimeMs;
+            var nextTickDelay = 1000 - driftMs;
+            
+            timerIntervalId = setTimeout(tick, Math.max(0, nextTickDelay)); 
+            totalElapsedTimeSeconds++;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            var digits = formatNumberToDigitsArray(totalElapsedTimeSeconds);
+            var elH = document.getElementById("seconds_hundreds");
+            var elT = document.getElementById("seconds_tens");
+            var elO = document.getElementById("seconds_ones");
+            if (elH && elT && elO) { 
+                elH.className = "time" + digits[0];
+                elT.className = "time" + digits[1];
+                elO.className = "time" + digits[2];
+            }
+        }
+
+        this.start = function() {
+            if (timerIntervalId) return; 
+            timerStartTime = new Date().getTime() - (totalElapsedTimeSeconds * 1000);
+            tick();
+        };
+        this.stop = function() {
+            clearTimeout(timerIntervalId);
+            timerIntervalId = null;
+        };
+        this.getTime = function() { return totalElapsedTimeSeconds; };
+        this.setTime = function(seconds) {
+            totalElapsedTimeSeconds = seconds;
+            updateTimerDisplay(); 
+        };
+    }
+
+    function updateMinesLeftDisplay() {
+        var digits = formatNumberToDigitsArray(minesLeftToFlag);
+        var elH = document.getElementById("mines_hundreds");
+        var elT = document.getElementById("mines_tens");
+        var elO = document.getElementById("mines_ones");
+         if (elH && elT && elO) { 
+            elH.className = "time" + digits[0];
+            elT.className = "time" + digits[1];
+            elO.className = "time" + digits[2];
+        }
+    }
+
+    function formatNumberToDigitsArray(number) { 
+        number = Math.min(number, 999); 
+        if (number >= 0) {
+            return [
+                Math.floor(number / 100),        
+                Math.floor((number % 100) / 10),  
+                number % 10                       
+            ];
+        } else { 
+            return [
+                "-",
+                Math.floor((-number % 100) / 10),
+                -number % 10
+            ];
+        }
+    }
+
+    function handleLoss(hitMines) { 
+        var r, c, i;
+        var square;
+        if(document.getElementById("face")) document.getElementById("face").className = "facedead";
+        timer.stop();
+        isGameOver = true;
+
+        for (r = 1; r <= numRows; r++) {
+            columnloop: 
+            for (c = 1; c <= numCols; c++) {
+                square = gameGrid[r][c];
+                if (!square.isRevealed()) {
+                    for (i = 0; i < hitMines.length; i++) {
+                        if (square === hitMines[i]) {
+                            square.setClass("square bombdeath");
+                            continue columnloop;
+                        }
+                    }
+                    if (square.isMine() && !square.isFlagged()) {
+                        square.setClass("square bombrevealed");
+                    } else if (!square.isMine() && square.isFlagged()) {
+                        square.setClass("square bombmisflagged");
+                    }
+                }
+            }
+        }
+    }
+
+    function handleWin() {
+        var r, c;
+        var square;
+        var isNewHighScore = false;
+
+        if(document.getElementById("face")) document.getElementById("face").className = "facewin";
+        timer.stop();
+        isGameOver = true;
+        minesLeftToFlag = 0; 
+        updateMinesLeftDisplay();
+
+        for (r = 1; r <= numRows; r++) {
+            for (c = 1; c <= numCols; c++) {
+                square = gameGrid[r][c];
+                if (!square.isRevealed() && !square.isFlagged()) { 
+                    square.setClass("square bombflagged");
+                }
+            }
+        }
+
+        var gameTime = timer.getTime();
+        if (gameTypeId > 0) { 
+            if (!isRestoredGame) { 
+                for (var scoreLevel = 3; scoreLevel >= 0; scoreLevel--) { 
+                    if (initialHighScores[scoreLevel] && initialHighScores[scoreLevel][gameTypeId - 1] !== undefined && gameTime <= initialHighScores[scoreLevel][gameTypeId - 1]) {
+                        submitHighScore(scoreLevel + 1, true); 
+                        isNewHighScore = true;
+                        break;
+                    }
+                }
+                if (!isNewHighScore &&
+                    ((gameTypeId === 1 && gameTime <= 10) ||  
+                     (gameTypeId === 2 && gameTime <= 50) ||  
+                     (gameTypeId === 3 && gameTime <= 150))) { 
+                    submitHighScore(1, false); 
+                }
+            }
+        }
+        if (self.onWin) { 
+            self.onWin(gameTypeId, gameTime);
+        }
+    }
+
+    function submitHighScore(scoreCategory, isOfficialRecord) { 
+        var categoryName;
+        var name, timeSubmitted;
+        var promptStartTime = (new Date()).getTime();
+        var timeToEnterName;
+
+        switch (scoreCategory) {
+            case 1: categoryName = "daily"; break;
+            case 2: categoryName = "weekly"; break;
+            case 3: categoryName = "monthly"; break;
+            case 4: categoryName = "all-time"; break;
+            default: categoryName = ""; break;
+        }
+
+        var storedName = (checkLocalStorageSupport() && localStorage.name) ? localStorage.name : "";
+        var promptMessage = isOfficialRecord ?
+            timer.getTime() + " is a new " + categoryName + " high score! Please enter your name" :
+            "Please enter your name to submit your score (" + timer.getTime() + ")";
+        
+        name = prompt(promptMessage, storedName);
+        name = $.trim(name || "").substring(0, 25); 
+
+        if (name && checkLocalStorageSupport()) {
+            localStorage.name = name;
+        }
+
+        timeToEnterName = Math.round(((new Date()).getTime() - promptStartTime) / 1000);
+        
+         if (isOfficialRecord && self.onNewHighScore) {
+             self.onNewHighScore(scoreCategory, isOfficialRecord);
+         }
+    }
+
+    function checkLocalStorageSupport() {
+        try {
+            return "localStorage" in window && window.localStorage !== null;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function isElementASquare(element) {
+        if (!element || !element.className) return false;
+        return element.className.substring(0, 6) === "square"; 
+    }
+
+    function getMouseButtonStates(event) {
+        var buttons = {};
+        if (isIE7OrLess) { 
+            buttons.left = event.button === 1 || event.button === 3 || event.button === 4; 
+            buttons.right = event.button === 2 || event.button === 3 || event.button === 4;
+        } else { 
+            buttons.left = event.button === 0 || event.button === 1; 
+            buttons.right = event.button === 2 || event.button === 1; 
+        }
+        return buttons;
+    }
+
+    function updateSquareClassOnHover(square, pressClass, normalClassIfMarked) {
+        if (!square || square.isRevealed()) return;
+
+        if (square.isMarked()) {
+            square.setClass(normalClassIfMarked); 
+        } else if (!square.isFlagged()) {
+            square.setClass(pressClass); 
+        }
+    }
+    function updateNeighborSquaresClassOnHover(centerSquare, pressClass, normalClassIfMarked) {
+        for (var dr = -1; dr <= 1; dr++) {
+            for (var dc = -1; dc <= 1; dc++) {
+                if (gameGrid[centerSquare.getRow() + dr] && gameGrid[centerSquare.getRow() + dr][centerSquare.getCol() + dc]){
+                    updateSquareClassOnHover(gameGrid[centerSquare.getRow() + dr][centerSquare.getCol() + dc], pressClass, normalClassIfMarked);
+                }
+            }
+        }
+    }
+
+    function initializeEventHandlers() {
+        var isFacePressed = false;
+        var lastHoveredSquareElementDuringDrag; 
+
+        function handleSquareHoverEffect(event) { 
+            if (event.type === "touchmove" && !isActiveTouch(event)) return;
+
+            var targetElement = getEventTarget(event);
+            if (targetElement !== lastHoveredSquareElementDuringDrag && !isChordInProgress) {
+                var pressClass = "square open0";
+                var normalClassForMarked = "square questionpressed";
+                var resetClass = "square blank";
+                var resetClassForMarked = "square question";
+
+                if (isRightMouseDown) { 
+                    if (lastHoveredSquareElementDuringDrag && squareCacheById[lastHoveredSquareElementDuringDrag.id]) {
+                        updateNeighborSquaresClassOnHover(squareCacheById[lastHoveredSquareElementDuringDrag.id], resetClass, resetClassForMarked);
+                    }
+                    if (isElementASquare(targetElement) && squareCacheById[targetElement.id]) {
+                        updateNeighborSquaresClassOnHover(squareCacheById[targetElement.id], pressClass, normalClassForMarked);
+                    }
+                } else { 
+                    if (lastHoveredSquareElementDuringDrag && squareCacheById[lastHoveredSquareElementDuringDrag.id]) {
+                        updateSquareClassOnHover(squareCacheById[lastHoveredSquareElementDuringDrag.id], resetClass, resetClassForMarked);
+                    }
+                    if (isElementASquare(targetElement) && squareCacheById[targetElement.id]) {
+                        updateSquareClassOnHover(squareCacheById[targetElement.id], pressClass, normalClassForMarked);
+                    }
+                }
+            }
+            lastHoveredSquareElementDuringDrag = isElementASquare(targetElement) ? targetElement : undefined;
+        }
+        
+        function handleFaceHoverEffect(event) { 
+            if (event.type === "touchmove" && !isActiveTouch(event)) return;
+            var targetElement = getEventTarget(event);
+            var faceEl = document.getElementById("face");
+            if (faceEl) { 
+                 faceEl.className = (targetElement.id === "face") ? "facepressed" : "facesmile";
+            }
+        }
+
+        function getEventTarget(event) {
+            if (event.type === "touchmove" || event.type === "touchend") {
+                var touch = event.originalEvent.changedTouches[0];
+                return document.elementFromPoint(touch.clientX, touch.clientY);
+            } else {
+                return event.target;
+            }
+        }
+        
+        function isActiveTouch(event) {
+            if (activeTouchIdentifier === null) return false;
+            return event.originalEvent.changedTouches[0].identifier === activeTouchIdentifier;
+        }
+
+        isIE7OrLess = $.browser.msie && parseFloat($.browser.version) <= 7;
+
+        $(document).bind("gesturestart", function(event) {
+            isGestureInProgress = true;
+            clearTouchState();
+        });
+        $(document).bind("gestureend", function(event) {
+            isGestureInProgress = false;
+        });
+        $(document).bind("scroll", clearTouchState); 
+
+        function clearTouchState() {
+            if (activeTouchIdentifier === null) return;
+            activeTouchIdentifier = null;
+            var faceEl = document.getElementById("face");
+            if (lastHoveredSquareElementDuringDrag && squareCacheById[lastHoveredSquareElementDuringDrag.id]) {
+                updateSquareClassOnHover(squareCacheById[lastHoveredSquareElementDuringDrag.id], "square blank", "square question");
+                lastHoveredSquareElementDuringDrag = undefined;
+            }
+            if (!isGameOver && faceEl) {
+                faceEl.className = "facesmile";
+            }
+        }
+
+        $(document).bind("touchstart", function(event) {
+            $(document).unbind("mousedown").unbind("mouseup"); 
+            if (activeTouchIdentifier || isGestureInProgress) return; 
+
+            activeTouchIdentifier = event.originalEvent.changedTouches[0].identifier;
+            var targetElement = event.target;
+            var faceEl = document.getElementById("face");
+
+
+            if (isElementASquare(targetElement) && !isGameOver) {
+                var touchId = activeTouchIdentifier; 
+                var squareElement = targetElement;   
+                
+                setTimeout(function() {
+                    if (touchId === activeTouchIdentifier && squareElement === lastHoveredSquareElementDuringDrag) {
+                        if(squareCacheById[squareElement.id]) squareCacheById[squareElement.id].flag(true); 
+                        activeTouchIdentifier = null; 
+                        if(!isGameOver && faceEl) faceEl.className = "facesmile";
+                    }
+                }, 500); 
+
+                $(document).bind("touchmove", handleSquareHoverEffect);
+                if(faceEl) faceEl.className = "faceooh";
+                lastHoveredSquareElementDuringDrag = undefined; 
+                handleSquareHoverEffect(event); 
+            } else if (targetElement.id === "face") {
+                isFacePressed = true;
+                $(document).bind("touchmove", handleFaceHoverEffect); 
+                if(faceEl) faceEl.className = "facepressed";
+            }
+        });
+
+        $(document).bind("touchend", function(event) {
+            if (!isActiveTouch(event)) return;
+            
+            var currentActiveTouch = activeTouchIdentifier; 
+            activeTouchIdentifier = null; 
+            var faceEl = document.getElementById("face");
+
+
+            $(document).unbind("touchmove", handleSquareHoverEffect).unbind("touchmove", handleFaceHoverEffect);
+            if ((isFacePressed || !isGameOver) && faceEl) {
+                faceEl.className = "facesmile";
+            }
+
+            var targetElement = getEventTarget(event);
+            if (isElementASquare(targetElement) && !isGameOver && currentActiveTouch !== null) { 
+                var square = squareCacheById[targetElement.id];
+                if (!square) return; 
+
+                if (!hasGameStartedPlaying) {
+                    var squareType = handleFirstClickSafety(square); 
+                    hasGameStartedPlaying = true;
+                }
+
+                if (square.isRevealed()) {
+                    square.reveal9(); 
+                } else if (square.isFlagged()) {
+                    square.flag(true); 
+                } else {
+                    if (!square.reveal1()) { 
+                        handleLoss([square]); 
+                    }
+                }
+                event.preventDefault();
+            } else if (targetElement.id === "face" && isFacePressed) {
+                self.newGame();
+            }
+            isFacePressed = false;
+        });
+
+        $(document).mousedown(function(event) {
+            var mouseButtons = getMouseButtonStates(event);
+            isLeftMouseDown = mouseButtons.left || isLeftMouseDown;
+            isRightMouseDown = mouseButtons.right || isRightMouseDown;
+            var targetElement = event.target;
+            var faceEl = document.getElementById("face");
+
+
+            if (event.ctrlKey && isElementASquare(targetElement) && !isGameOver) {
+                if(squareCacheById[targetElement.id]) squareCacheById[targetElement.id].flag(); 
+                isMouseDownForCtrlClick = true; 
+            } else if (isLeftMouseDown) {
+                if (isElementASquare(targetElement) && !isGameOver) {
+                    event.preventDefault(); 
+                    $(document).bind("mousemove", handleSquareHoverEffect);
+                    if(faceEl) faceEl.className = "faceooh";
+                    lastHoveredSquareElementDuringDrag = undefined;
+                    handleSquareHoverEffect(event); 
+                } else if (targetElement.id === "face") {
+                    event.preventDefault();
+                    isFacePressed = true;
+                    $(document).bind("mousemove", handleFaceHoverEffect);
+                    if(faceEl) faceEl.className = "facepressed";
+                }
+            } else if (isRightMouseDown) { 
+                 if (isElementASquare(targetElement) && !isGameOver) {
+                    if(squareCacheById[targetElement.id]) squareCacheById[targetElement.id].flag();
+                 }
+            }
+        });
+        
+        $(document).on("contextmenu", function(event) {
+            var $target = $(event.target);
+            if ($target.is("#game") || $target.closest("#game").length > 0) {
+                 event.preventDefault(); 
+                 return false;
+            }
+        });
+
+        $(document).mouseup(function(event) {
+            var mouseButtons = getMouseButtonStates(event);
+            var square, squareType;
+            var faceEl = document.getElementById("face");
+
+
+            if (isMouseDownForCtrlClick) { 
+                isLeftMouseDown = false;
+                isRightMouseDown = false;
+                isMouseDownForCtrlClick = false;
+                return;
+            }
+
+            if (mouseButtons.left) { 
+                isLeftMouseDown = false;
+                $(document).unbind("mousemove", handleSquareHoverEffect).unbind("mousemove", handleFaceHoverEffect);
+                
+                if ((isFacePressed || !isGameOver) && faceEl) { 
+                    faceEl.className = "facesmile";
+                }
+
+                if (isElementASquare(event.target) && !isGameOver) {
+                    square = squareCacheById[event.target.id];
+                    if(!square) return;
+
+                    if (isRightMouseDown) { 
+                        isChordInProgress = true; 
+                        updateNeighborSquaresClassOnHover(square, "square blank", "square question"); 
+                        square.reveal9();
+                    } else { 
+                        if (!isChordInProgress) { 
+                            if (!hasGameStartedPlaying) {
+                                squareType = handleFirstClickSafety(square);
+                                hasGameStartedPlaying = true;
+                            }
+                            if (!square.reveal1()) { 
+                                handleLoss([square]);
+                            }
+                        }
+                    }
+                    isChordInProgress = false; 
+                } else if (event.target.id === "face" && isFacePressed) {
+                    self.newGame();
+                }
+                isFacePressed = false;
+            }
+
+            if (mouseButtons.right) { 
+                isRightMouseDown = false;
+                if (isElementASquare(event.target) && !isGameOver) {
+                    square = squareCacheById[event.target.id];
+                    if(!square) return;
+
+                    if (isLeftMouseDown) { 
+                        isChordInProgress = true;
+                        updateNeighborSquaresClassOnHover(square, "square blank", "square question"); 
+                        square.reveal9();
+                    } 
+                    isChordInProgress = false; 
+                }
+                 if (!isGameOver && faceEl) { 
+                    faceEl.className = "facesmile";
+                }
+            }
+        });
+
+        $(document).keydown(function(event) {
+            var square;
+            var faceEl = document.getElementById("face");
+
+            if (event.which === 113) { // F2 for new game
+                self.newGame();
+            } else if (event.which === 32) { // Space bar
+                if (hoveredSquareId && !isGameOver && squareCacheById[hoveredSquareId]) {
+                    square = squareCacheById[hoveredSquareId];
+                    if (square.isRevealed()) {
+                        square.reveal9(); 
+                    } else {
+                        square.flag();    
+                    }
+                }
+                event.preventDefault(); 
+            } else if (event.which === 90 && !event.shiftKey && isCtrlOrCmd(event)) { // Ctrl+Z or Cmd+Z
+                if (faceEl && faceEl.className === "facedead" && lastGoodGridState) {
+                    self.newGame(lastGoodGridState, { time: timer.getTime() }); 
+                }
+            }
+        });
+        
+        function isCtrlOrCmd(event) {
+            var isMac = window.navigator && window.navigator.platform && window.navigator.platform.toLowerCase().indexOf("mac") !== -1;
+            return isMac ? event.metaKey : event.ctrlKey;
+        }
+
+        $("#game").mouseover(function(event) {
+            if (isElementASquare(event.target)) {
+                hoveredSquareId = event.target.id;
+            }
+        });
+        $("#game").mouseout(function(event) {
+            if (isElementASquare(event.target)) {
+                if (hoveredSquareId === event.target.id) { 
+                    hoveredSquareId = "";
+                }
+            }
+        });
+    } 
+}

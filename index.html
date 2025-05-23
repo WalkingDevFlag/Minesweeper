@@ -11,8 +11,8 @@
             flex-direction: column; 
             align-items: center; 
             margin-top: 15px; 
-            font-family: Arial, sans-serif; /* Added for consistency */
-            transition: background-color 0.3s, color 0.3s; /* For night mode */
+            font-family: Arial, sans-serif; 
+            transition: background-color 0.3s, color 0.3s; 
         }
         .ui-controls { 
             margin-bottom: 10px; 
@@ -25,26 +25,24 @@
         .ui-controls button, .ui-controls a {
             margin: 2px 5px;
         }
-        /* Dialog styling (some from CSS, some for basic positioning) */
         .dialog {
-            /* Basic positioning, minesweeper.css has more */
             position: fixed; 
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            padding: 0; /* Let inner divs handle padding */
+            padding: 0; 
             min-width: 300px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 100; /* Ensure dialogs are on top */
+            z-index: 100; 
         }
         .dialog-title { 
             padding: 8px 12px; 
-            cursor: move; /* For basic dragging */
+            cursor: move; 
             font-size: 14px;
         }
         .dialog-title .dialog-close { 
             float: right; 
-            font-size: 18px; /* Adjusted from CSS for better visibility */
+            font-size: 18px; 
             line-height: 18px;
         }
         .dialog-content { 
@@ -59,16 +57,12 @@
         #custom-settings p {
             margin: 5px 0;
         }
-        #game-container {
-            /* Styles applied by JS and CSS, just a container */
-        }
         #game {
-            /* Game board elements are injected here by JS */
-            border: 2px solid; /* Visual consistency based on typical Minesweeper */
-            border-color: #7b7b7b #fff #fff #7b7b7b; /* For default theme */
+            border: 2px solid; 
+            border-color: #7b7b7b #fff #fff #7b7b7b; 
         }
         .night-mode #game {
-            border-color: #505050 #c0c0c0 #c0c0c0 #505050; /* Adjusted for night mode */
+            border-color: #505050 #c0c0c0 #c0c0c0 #505050; 
         }
 
     </style>
@@ -79,19 +73,14 @@
 
     <div class="ui-controls">
         <button id="newGameBtn">New Game (F2)</button> |
-        <a href="#" id="options-link">Options</a> |
-        <a href="#" id="display-link">Zoom</a> |
-        <a href="#" id="controls-info-link">Controls</a> |
-        <a href="#" id="import-link">Import</a> |
-        <a href="#" id="export-link">Export</a>
+        <a href="#" id="options-link">Options</a>
         <br>
-        <input type="checkbox" id="marks"> <label for="marks">Question Marks (?)</label>
-        <button id="toggleNightMode">Toggle Night Mode</button>
+        <button id="toggleNightModeBtn">Toggle Night Mode</button> 
     </div>
 
-    <div id="game-container" class="z100"> <!-- Default zoom class -->
+    <div id="game-container" class="z100"> 
         <div id="game">
-            <!-- Minesweeper board is built here by minesweeper.js -->
+            {/* Minesweeper board is built here by minesweeper.js */}
         </div>
     </div>
 
@@ -115,47 +104,25 @@
         </div>
     </div>
 
-    <!-- Controls Info Dialog -->
-    <div id="controls-info-dialog" class="dialog" style="display:none;">
-        <div class="dialog-title">Controls <span class="dialog-close">X</span></div>
-        <div class="dialog-content">
-            <ul>
-                <li><b>Left Click:</b> Reveal square</li>
-                <li><b>Right Click:</b> Flag/Unflag square (or cycle to '?' if question marks enabled)</li>
-                <li><b>Middle Click (or Left+Right Click simultaneously):</b> Reveal adjacent non-flagged squares (chord action)</li>
-                <li><b>Space Bar:</b> Flag/Unflag or Chord on hovered square</li>
-                <li><b>F2 Key:</b> Start a new game</li>
-                <li><b>Ctrl+Click / Cmd+Click (on Mac):</b> Flag/Unflag square</li>
-                <li><b>(After losing) Ctrl+Z / Cmd+Z (on Mac):</b> Undo last move (resets to state before the mine was hit)</li>
-                <li><b>Long Press (Touch Devices):</b> Flag/Unflag square</li>
-            </ul>
-        </div>
-    </div>
+    
 
     <!-- jQuery Core -->
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-    <!-- jQuery Migrate Plugin (for jQuery 1.9+ to restore $.browser and other features) -->
+    <!-- jQuery Migrate Plugin (still needed for $.browser) -->
     <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
     <!-- Your Minesweeper Script -->
     <script src="minesweeper.js"></script>
     <script>
         $(document).ready(function() {
-            // You can add a quick check here to see what jQuery reports for $.browser
-            // console.log("jQuery version:", $.fn.jquery);
-            // console.log("$.browser after migrate:", $.browser);
-
-            // A: highScoreData (placeholder, format: A[level_idx (0-3)][gameType_idx (0-2)])
             const defaultHighScores = [ 
                 [999, 999, 999], [999, 999, 999], [999, 999, 999], [999, 999, 999]
             ];
 
-            // Application state for game settings
             let AppSettings = {
-                gameTypeId: 1, // 1: Beginner, 2: Intermediate, 3: Expert, 0: Custom
+                gameTypeId: 1, 
                 numRows: 9,
                 numCols: 9,
                 numMines: 10,
-                zoom: 1, // 1 = 100%, 1.5 = 150%, 2 = 200%
                 presets: {
                     1: { name: "Beginner", numRows: 9, numCols: 9, numMines: 10 },
                     2: { name: "Intermediate", numRows: 16, numCols: 16, numMines: 40 },
@@ -164,23 +131,15 @@
             };
 
             function getGameSettingsForMinesweeper() {
-                return {
+                return { 
                     gameTypeId: AppSettings.gameTypeId,
                     numRows: AppSettings.numRows,
                     numCols: AppSettings.numCols,
-                    numMines: AppSettings.numMines,
-                    zoom: AppSettings.zoom
+                    numMines: AppSettings.numMines
                 };
             }
 
-            function setGameSettingsByMinesweeper(settings) {
-                if (typeof settings.gameTypeId !== "undefined") AppSettings.gameTypeId = settings.gameTypeId;
-                if (typeof settings.numRows !== "undefined") AppSettings.numRows = settings.numRows;
-                if (typeof settings.numCols !== "undefined") AppSettings.numCols = settings.numCols;
-                if (typeof settings.numMines !== "undefined") AppSettings.numMines = settings.numMines;
-            }
-
-            const minesweeper = new Minesweeper(defaultHighScores, getGameSettingsForMinesweeper, setGameSettingsByMinesweeper);
+            const minesweeper = new Minesweeper(defaultHighScores, getGameSettingsForMinesweeper);
 
             function startNewGameWithCurrentAppSettings() {
                 minesweeper.newGame(null, {
@@ -199,7 +158,6 @@
 
             $('.dialog-close').click(function() { $(this).closest('.dialog').hide(); });
             $('#options-link').click(function(e) { e.preventDefault(); $('#options-dialog').show(); populateOptionsDialog(); });
-            $('#controls-info-link').click(function(e) { e.preventDefault(); $('#controls-info-dialog').show(); });
 
             function populateOptionsDialog() {
                 const currentSettings = AppSettings;
@@ -267,44 +225,14 @@
                 $('#options-dialog').hide();
             });
 
-            $('#display-link').click(function(e) {
-                e.preventDefault();
-                let currentZoom = AppSettings.zoom;
-                let nextZoom;
-                if (currentZoom === 1) nextZoom = 1.5;
-                else if (currentZoom === 1.5) nextZoom = 2;
-                else nextZoom = 1;
-                
-                minesweeper.resize(nextZoom); 
-                AppSettings.zoom = nextZoom; 
-            });
-
-            $('#export-link').click(function(e) {
-                e.preventDefault();
-                const exportedData = minesweeper.export_();
-                prompt("Game State (Ctrl+C to copy):", exportedData);
-            });
-
-            $('#import-link').click(function(e) {
-                e.preventDefault();
-                const importedData = prompt("Paste Game State here:");
-                if (importedData && importedData.trim() !== "") {
-                    if (minesweeper.isImportable(importedData)) {
-                        try {
-                            minesweeper.import_(importedData);
-                            populateOptionsDialog();
-                        } catch (error) {
-                            alert("Error importing game: " + error.message);
-                            console.error("Import error details:", error);
-                        }
-                    } else {
-                        alert("Data is not in a recognized importable format.");
-                    }
-                }
-            });
-
-            $('#toggleNightMode').click(function() {
+            // --- Night Mode Toggle with Text Change ---
+            $('#toggleNightModeBtn').click(function() {
                 $('body').toggleClass('night-mode');
+                if ($('body').hasClass('night-mode')) {
+                    $(this).text('Toggle Light Mode');
+                } else {
+                    $(this).text('Toggle Night Mode');
+                }
             });
 
             minesweeper.onWin = function(gameTypeId, time) {
@@ -312,13 +240,9 @@
                     alert(`Congratulations! You won in ${time} seconds!`);
                 }, 100);
             };
-            minesweeper.onNewHighScore = function(level, isOfficialRecord) { 
+             minesweeper.onNewHighScore = function(level, isOfficialRecord) { 
                  // console.log(`New high score for level ${level}. Official: ${isOfficialRecord}`);
              };
-            minesweeper.onResize = function() {
-                 // console.log(`Game resized. Current zoom factor: ${AppSettings.zoom}`);
-             };
-
             $('.dialog-title').on('mousedown', function(e) {
                 var $dialog = $(this).closest('.dialog');
                 if ($(e.target).is('.dialog-close')) {
